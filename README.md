@@ -30,7 +30,7 @@ Poszczególne zadania rozwiązuj w odpowiednich plikach.
 
 ___
 
-# Dzień 5: Starcie Ostateczne, czyli interaktywna aplikacja webowa
+# Dzień 7: Starcie Ostateczne, czyli interaktywna aplikacja webowa
 
 Pozostało kilka drobnych rzeczy zanim będziesz gotowy/a na interaktywne połączenie swoich aplikacji. Są to: zapis danych po stronie back-endu oraz obsługa zapytań AJAXowych/JSON.
 
