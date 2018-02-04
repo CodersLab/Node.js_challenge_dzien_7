@@ -70,6 +70,32 @@ app.post('/toggle', (req, res) => {
   });
 });
 
+app.post('/edit', (req, res) => {
+  fs.readFile(DB_FILE, (err, data) => {
+    if (!err) {
+      const todos = JSON.parse(data);
+      req.body.i.forEach((val, index) => {
+        todos[val].todo = req.body.editTodo[index];
+      })
+
+      const updateTodos = JSON.stringify(todos);
+
+      fs.writeFile(DB_FILE, updateTodos, (err, data) => {
+        if (!err) {
+          res.json({
+            todos
+          });
+          console.log('Edited Todos id:', req.body.i, "value: ", req.body.editTodo);
+        } else {
+          console.log('Błąd zapisu pliku', err);
+        }
+      });
+    } else {
+      console.log('Błąd odczytu pliku', err);
+    }
+  });
+});
+
 app.post('/destroy', (req, res) => {
   fs.readFile(DB_FILE, (err, data) => {
     if (!err) {
@@ -92,6 +118,30 @@ app.post('/destroy', (req, res) => {
     }
   });
 });
+
+app.post('/clear', (req, res) => {
+  fs.readFile(DB_FILE, (err, data) => {
+    if (!err) {
+      let todos = JSON.parse(data);
+      todos = todos.filter(item => !item.complete);
+      const updateTodos = JSON.stringify(todos);
+
+      fs.writeFile(DB_FILE, updateTodos, (err, data) => {
+        if (!err) {
+          res.json({
+            todos
+          });
+          console.log('Cleared completed');
+        } else {
+          console.log('Błąd zapisu pliku', err);
+        }
+      });
+    } else {
+      console.log('Błąd odczytu pliku', err);
+    }
+  });
+});
+
 
 app.listen(3000, () => {
   console.log('Serwer uruchomiony na porcie 3000');

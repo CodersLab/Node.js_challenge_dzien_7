@@ -2,9 +2,10 @@
   "name": "challenge",
   "version": "1.0.0",
   "description": "",
-  "main": "zadanie01.js",
+  "main": "zadanieDnia.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node zadanieDnia"
   },
   "author": "",
   "license": "ISC",
