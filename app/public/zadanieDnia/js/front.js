@@ -1,16 +1,19 @@
 // Twój kod
 $(() => {
-  console.log('skrypt załadowany');
-
   const newTask = $('.new-todo');
   const list = $('.todo-list');
+  const JSON_AJAX = {
+    HEADERS: { 'Content-type': 'application/json' },
+    TYPE: 'POST',
+    DATATYPE: 'json'
+}
 
-  const addItem = (item) => {
+  const addItem = task => {
     list.children().first().prepend($(`
-    <li ${item.comleted ? 'completed' : null}>
+    <li ${task.comleted ? 'completed' : null} id='${task.id}'>
       <div class="view">
         <input class="toggle" type="checkbox">
-        <label>${item.text + ' ' + item.id}</label>
+        <label>${task.id + ' ' + task.text}</label>
         <button class="destroy"></button>
       </div>
       <input class="edit" value="Rule the web">
@@ -18,41 +21,51 @@ $(() => {
     `));
   };
 
-  const updateList = () => {
-    $.ajax({
-      url: '/list',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      type : 'POST',
-      dataType : 'json'
-    }).then((ans) => {
-      console.log(ans);
-      ans.forEach((item) => {
-        addItem(item);
-      })
+  const updateList = newList => {
+    newList.forEach(task => {
+      addItem(task);
     });
   }
 
-  updateList();
+  (() => {
+    $.ajax({
+      url: '/list',
+      headers: JSON_AJAX.HEADERS,
+      type: JSON_AJAX.TYPE,
+      dataType: JSON_AJAX.DATATYPE
+    }).then(({ newList, response }) => {
+      if (newList) {
+        updateList(newList);
+      }
+      console.log(response);
+    }).then(() => {
+      $(document).keypress(function(e) {
+        if(e.which == 13) {
+            $.ajax({
+              url: '/new-task',
+              data: JSON.stringify({
+                text: newTask.val(),
+              }),
+              headers: JSON_AJAX.HEADERS,
+              type: JSON_AJAX.TYPE,
+              dataType: JSON_AJAX.DATATYPE
+            }).then(({ newList, response }) => {
+              if (newList) {
+                updateList(newList);
+              }
+              console.log(response);
+            });
+        }
+      });
+    
+      
+      $('.todo-list li').dblclick(event => {
+        const taskId = event.target.parentNode.parentNode.id;
+        const taskText = event.target.innerText;
+        console.log(taskText);
+        $(event.target).attr('contentEditable', true).focus();
+      });
+    })
+  })()
 
-
-  $(document).keypress(function(e) {
-    if(e.which == 13) {
-        $.ajax({
-          url: '/new-task',
-          data: JSON.stringify({
-            text: newTask.val(),
-          }),
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          type : 'POST',
-          dataType : 'json'
-        }).then(ans => {
-          updateList();
-          console.log(ans);
-        });
-    }
-  });
 });

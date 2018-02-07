@@ -7,21 +7,27 @@ const DB_FILE = './app/data/zadanieDnia/db.json';
 const app = express();
 
 app.use(bodyParser.json());
-app.use(express.static('./app/public/zadanieDnia/')); //czemu w przykładzie wystarczy ścieżka względna do przykladAjax.js, a tutaj potrzebuję ścieżki względem node-modules?
+app.use(express.static('./app/public/zadanieDnia/'));
 
 app.post('/list', (req, res) => {
   fs.readFile(DB_FILE, (err, data) => {
-    if (!err) {
-      res.json(JSON.parse(data));
+    if (!err){
+      const newList = JSON.parse(data);
+      const response = 'Baza danych odczytana';
+      console.log(newList);
+      res.json({ newList, response });
+      console.log(response);
     } else {
-      res.json('Błąd odczytu pliku');
+      const response = 'Błąd odczytu bazy danych';
+
+      res.json({ response });
+      console.log(response, err);
     }
   });
 });
 
 app.post('/new-task', (req, res) => {
   const newTask = req.body;
-  
 
   fs.readFile(DB_FILE, (err, data) => {
     if (!err){
@@ -33,27 +39,56 @@ app.post('/new-task', (req, res) => {
       }, [0]));
 
       Object.assign(newTask, { id: newId, completed: false });
-      const newList = JSON.stringify(list.concat(newTask));
+      const newList = list.concat(newTask);
       
-      // console.log(newList);
-
-      fs.writeFile(DB_FILE, newList, (err, data) => {
+      fs.writeFile(DB_FILE, JSON.stringify(newList), (err) => {
         if (!err) {
-            console.log('Plik zapisany');
-            res.json('Plik zapisany');
+          const response = 'Nowe zadanie zapisane';
+
+          res.json({ newList, response });
+          console.log(response);
         } else {
-            console.log('Błąd zapisu pliku', err);
-            res.json('Błąd zapisu pliku');
+          const response = 'Błąd zapisu nowego zadania';
+
+          res.json({ newList: list, response });
+          console.log(response, err);
         }
       });
     } else {
-      console.log('Błąd odczytu pliku', err);
-      res.json('Błąd odczytu pliku');
+      const response = 'Błąd odczytu bazy danych';
+      console.log(response, err);
+      res.json({ response });
     }
   });
   
 });
 
+app.post('/modify', (req, res) => {
+  const modifiedTask = req.body;
+
+  fs.readFile(DB_FILE, (err, data) => {
+    if (!err){
+      const list = JSON.parse(data);
+      const newList = data.map(task => task.id === modifiedTask.id ? modifiedTask : task);
+
+      fs.writeFile(DB_FILE, newList, (err) => {
+        if(!err) {
+          const response = 'Modyfikacja zapisana';
+          res.json({ newList, response })
+          console.log(response);
+        } else {
+          const response = 'Błąd przy zapisywaniu modyfikacji';
+          res.json({ response });      
+          console.log(response, err);
+        }
+      });
+    } else {
+      const response = 'Błąd odczytu bazy danych';
+      res.json({ response });
+      console.log(response, err);
+    }
+  });
+});
 
 
 app.listen(3000, () => console.log('serwer stoi na porcie 3000'));
