@@ -65,16 +65,24 @@ app.post('/new-task', (req, res) => {
 
 app.post('/modify', (req, res) => {
   const modifiedTask = req.body;
-
+  
   fs.readFile(DB_FILE, (err, data) => {
     if (!err){
       const list = JSON.parse(data);
-      const newList = data.map(task => task.id === modifiedTask.id ? modifiedTask : task);
+      const newList = list.map(task => {
+        console.log('task, modifiedTask', task, modifiedTask)
+        if (task.id === modifiedTask.id) {
+          Object.assign(task, modifiedTask)
+        }
+        console.log('Object.assign(task, modifiedTask)', task)
+        return task;
+      });
+      console.log('newList', JSON.stringify(newList))
 
-      fs.writeFile(DB_FILE, newList, (err) => {
+      fs.writeFile(DB_FILE, JSON.stringify(newList), (err) => {
         if(!err) {
           const response = 'Modyfikacja zapisana';
-          res.json({ newList, response })
+          res.json({ newList: JSON.stringify(newList), response })
           console.log(response);
         } else {
           const response = 'Błąd przy zapisywaniu modyfikacji';

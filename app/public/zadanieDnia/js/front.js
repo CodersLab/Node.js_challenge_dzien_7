@@ -6,10 +6,10 @@ $(() => {
     HEADERS: { 'Content-type': 'application/json' },
     TYPE: 'POST',
     DATATYPE: 'json'
-}
+  }
 
   const addItem = task => {
-    list.children().first().prepend($(`
+    list.prepend($(`
     <li ${task.comleted ? 'completed' : null} id='${task.id}'>
       <div class="view">
         <input class="toggle" type="checkbox">
@@ -20,52 +20,76 @@ $(() => {
     </li>
     `));
   };
-
+  
+  //TODO add sending modification on enter
+  const addTaskEventHandlers = element => {
+    element.dblclick(event => {
+      console.log('onDblClick', event.target);
+      $(event.target)
+      .attr('contentEditable', true)
+      .focus()
+      .blur(event => {
+        const id = event.target.parentNode.parentNode.id;
+        const text = event.target.innerText;
+        
+        $.ajax({
+          url: '/modify',
+          data: JSON.stringify({ id, text }),
+          headers: JSON_AJAX.HEADERS,
+          type: JSON_AJAX.TYPE,
+          dataType: JSON_AJAX.DATATYPE
+        }).then(({ newList, response }) => {
+          console.log('newList', JSON.parse(newList));
+          if (newList) {
+            updateList(JSON.parse(newList));
+          }
+          console.log(response);
+        });
+        
+        $(event.target).attr('contentEditable', false);
+      });
+    });
+  }
+  
   const updateList = newList => {
+    //rerenders task list
+    list.empty();
     newList.forEach(task => {
       addItem(task);
     });
+    addTaskEventHandlers($('.todo-list li'));
   }
 
-  (() => {
-    $.ajax({
-      url: '/list',
-      headers: JSON_AJAX.HEADERS,
-      type: JSON_AJAX.TYPE,
-      dataType: JSON_AJAX.DATATYPE
-    }).then(({ newList, response }) => {
-      if (newList) {
-        updateList(newList);
-      }
-      console.log(response);
-    }).then(() => {
-      $(document).keypress(function(e) {
-        if(e.which == 13) {
-            $.ajax({
-              url: '/new-task',
-              data: JSON.stringify({
-                text: newTask.val(),
-              }),
-              headers: JSON_AJAX.HEADERS,
-              type: JSON_AJAX.TYPE,
-              dataType: JSON_AJAX.DATATYPE
-            }).then(({ newList, response }) => {
-              if (newList) {
-                updateList(newList);
-              }
-              console.log(response);
-            });
+  //initial list pull
+  $.ajax({
+    url: '/list',
+    headers: JSON_AJAX.HEADERS,
+    type: JSON_AJAX.TYPE,
+    dataType: JSON_AJAX.DATATYPE
+  }).then(({ newList, response }) => {
+    if (newList) {
+      updateList(newList);
+    }
+    console.log(response);
+  });
+  
+  //TODO modify enter to work only when new taskk input is focused
+  $(document).keypress(event => {
+    if(event.which == 13) {
+      $.ajax({
+        url: '/new-task',
+        data: JSON.stringify({
+          text: newTask.val(),
+        }),
+        headers: JSON_AJAX.HEADERS,
+        type: JSON_AJAX.TYPE,
+        dataType: JSON_AJAX.DATATYPE
+      }).then(({ newList, response }) => {
+        if (newList) {
+          updateList(newList);
         }
+        console.log(response);
       });
-    
-      
-      $('.todo-list li').dblclick(event => {
-        const taskId = event.target.parentNode.parentNode.id;
-        const taskText = event.target.innerText;
-        console.log(taskText);
-        $(event.target).attr('contentEditable', true).focus();
-      });
-    })
-  })()
-
+    }
+  });
 });
