@@ -23,6 +23,10 @@ app.get('/task/list', (req, res) => {
     
 });
 
+app.post('/task', (req, res) => {
+    console.log('new task url');
+});
+
 app.listen(3000, () => {
     console.log('Serwer uruchomiony na porcie 3000');
 });

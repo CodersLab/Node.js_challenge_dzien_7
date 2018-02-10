@@ -1,9 +1,10 @@
 $(document).ready(function() {
 
-    var taskListUrl = '/task/list';
-    var listUl  = $('.todo-list');
+    const taskListUrl = '/task/list';
+    const newTaskUrl  = '/task';
+    const listUl  = $('.todo-list');
 
-    function readData(url) {
+    const readData = (url) =>  {
         $.ajax({
             url : url,
             dataType : 'json'
@@ -19,7 +20,7 @@ $(document).ready(function() {
 
     readData(taskListUrl);
 
-    function createTaskLi(task){
+    const createTaskLi = (task) => {
         let li = $(`
                 <li>
                     <div class="view">
@@ -33,4 +34,15 @@ $(document).ready(function() {
         listUl.append(li);
     }
 
+    const newTask = $('.new-todo');
+
+    newTask.on('click', () => {
+       
+    });
+
+    const newTask = () => {
+
+    }
+
+    
 });
