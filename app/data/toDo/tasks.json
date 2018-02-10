@@ -1,10 +1,1 @@
-{
-    "tasks": [
-        {
-           "title": "Taste JavaScript"
-        },
-        {
-            "title": "Buy a unicorn"
-        }
-    ]
-}
+{"tasks":[{"title":"Taste JavaScript","completed":true},{"title":"Buy a unicorn","completed":false},{"title":"Posprzątać","completed":false},{"title":"Pozmywać","completed":false},{"title":"Marcin","completed":false},{"title":"Marcin","completed":false},{"title":"Marcin3","completed":false},{"title":"Nowe zadanie","completed":false},{"title":"Janusz","completed":false},{"title":"Zjeść","completed":false}]}
