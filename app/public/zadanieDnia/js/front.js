@@ -12,15 +12,15 @@ $(document).ready(function() {
         .done(ret => {
             console.log(ret);
 
-            ret.tasks.forEach(element => {
-               createTaskLi(element); 
+            ret.tasks.forEach((element, i) => {
+               createTaskLi(element, i); 
             });
         });
     }
 
     readData(taskListUrl);
 
-    const createTaskLi = (task) => {
+    const createTaskLi = (task, i) => {
 
         let complete = '';
 
@@ -29,7 +29,7 @@ $(document).ready(function() {
         }
 
         let li = $(`
-                <li class="${complete}">
+                <li id="${i}" class="${complete}">
                     <div class="view">
                         <input class="toggle" type="checkbox">
                         <label>${task.title}</label>
