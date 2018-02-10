@@ -1,0 +1,79 @@
+<!-- Plik pochodzi z: https://github.com/tastejs/todomvc-app-template -->
+
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Template • TodoMVC</title>
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/index.css">
+</head>
+
+<body>
+  <section class="todoapp">
+    <header class="header">
+      <h1>todos</h1>
+      <form action='/add' method='post'>
+        <input class="new-todo" placeholder="What needs to be done?" autofocus name="todo">
+      </form>
+    </header>
+    <!-- This section should be hidden by default and shown when there are todos -->
+    <section class="main">
+      <input id="toggle-all" class="toggle-all" type="checkbox">
+      <label for="toggle-all">Mark all as complete</label>
+
+      <ul class="todo-list">
+        <% for(var i=0; i < todos.length; i++) {%>
+          <li class="<% if (todos[i].complete) { %>completed<% } %>">
+            <div class="view">
+              <input class="toggle" type="checkbox" <% if (todos[i].complete) { %>checked
+              <% } %>>
+                <label><%= todos[i].todo %></label>
+                <button class="destroy" id="<%= todos[i]._id %>"></button>
+            </div>
+            <input class="edit new-value" value="Create a TodoMVC template">
+          </li>
+          <% } %>
+      </ul>
+
+    </section>
+    <!-- This footer should hidden by default and shown when there are todos -->
+    <% if (todos.length > 0) { %>
+      <footer class="footer">
+        <!-- This should be `0 items left` by default -->
+        <span class="todo-count"><strong>
+      <%= (!todos) ? 0 : todos.filter(item => !item.complete).length %>
+      </strong> item left</span>
+        <!-- Remove this if you don't implement routing -->
+        <ul class="filters">
+          <li>
+            <a class="selected" href="#/">All</a>
+          </li>
+          <li>
+            <a href="#/active">Active</a>
+          </li>
+          <li>
+            <a href="#/completed">Completed</a>
+          </li>
+        </ul>
+        <!-- Hidden if no completed items are left ↓ -->
+        <button class="clear-completed">Clear completed</button>
+      </footer>
+      <% } %>
+  </section>
+  <footer class="info">
+    <p>Double-click to edit a todo</p>
+    <!-- Remove the below line ↓ -->
+    <p>Template by <a href="http://sindresorhus.com">Sindre Sorhus</a></p>
+    <!-- Change this out with your name and url ↓ -->
+    <p>Created by <a href="http://todomvc.com">you</a></p>
+    <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
+  </footer>
+  <!-- Scripts here. Don't remove ↓ -->
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="/js/front.js"></script>
+</body>
+
+</html>
