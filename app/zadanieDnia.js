@@ -53,6 +53,68 @@ app.post('/task', (req, res) => {
     });
 });
 
+app.delete('/task', (req, res) => {
+
+    let eventTask = req.body;
+
+    fs.readFile(DB_FILE, (err, data) => {
+        if (!err){
+            taskList = JSON.parse(data);
+
+            taskList.tasks.splice(eventTask.id, 1)
+
+            let allTasks = { "tasks" : [...taskList.tasks]};
+
+            let writeData = JSON.stringify(allTasks);
+
+            fs.writeFile(DB_FILE, writeData, (err, data) => {
+                if (!err) {
+                    res.send('Dodano.');
+                } else {
+                    console.log('Błąd zapisu pliku', err);
+                    res.send('Wystąpił błąd zapisu.');
+                }
+            });
+        } else {
+            throw new Error("Bład zaladowania taskow");
+        }
+    });
+
+});
+
+app.put('/task', (req, res) => {
+
+    let eventTask = req.body;
+
+    console.log(eventTask);
+
+    fs.readFile(DB_FILE, (err, data) => {
+        if (!err){
+            taskList = JSON.parse(data);
+
+            let finded = taskList.tasks[eventTask.id];
+
+            finded.completed = eventTask.value;
+
+            let allTasks = { "tasks" : [...taskList.tasks]};
+
+            let writeData = JSON.stringify(allTasks);
+
+            fs.writeFile(DB_FILE, writeData, (err, data) => {
+                if (!err) {
+                    res.send('Dodano.');
+                } else {
+                    console.log('Błąd zapisu pliku', err);
+                    res.send('Wystąpił błąd zapisu.');
+                }
+            });
+        } else {
+            throw new Error("Bład zaladowania taskow");
+        }
+    });
+
+});
+
 app.listen(3000, () => {
     console.log('Serwer uruchomiony na porcie 3000');
 });

@@ -26,14 +26,16 @@ $(document).ready(function() {
 
         let complete = '';
         let checked = '';
+        let dataComplete = 0;
 
         if(task.completed){
             complete = 'completed';
             checked = 'checked';
+            dataComplete = 1;
         }
 
         let li = $(`
-                <li id="${i}" class="${complete}">
+                <li id="${i}" data-complete=${dataComplete} class="${complete}">
                     <div class="view">
                         <input class="toggle" type="checkbox" ${checked}>
                         <label>${task.title}</label>
@@ -79,18 +81,58 @@ $(document).ready(function() {
         const destroyLi = listLi.find('.destroy');
 
         destroyLi.on('click', function(e){
+
             e.stopPropagation();
             let liId = $(this).parent().parent().attr('id');
-            console.log('usuń!');
+
+            let eventTask = new UpdateTask(liId, 'DELETE', 'true');
+
+            updateTaskEvent(newTaskUrl, eventTask);
+
         });
 
         const completeLi = listLi.find('.toggle');
 
         completeLi.on('click', function(e){
             e.stopPropagation();
-            $(this).attr('id');
-            console.log($(this).parent().parent().attr('id'));
+            let liId = $(this).parent().parent().attr('id');
+
+            let value = false;
+
+            let completeValue = $(this).parent().parent().attr('data-complete');
+
+            if(completeValue == 0){
+                value = true;
+            }
+
+            console.log(value);
+
+             let eventTask = new UpdateTask(liId, 'PUT', value);
+
+             updateTaskEvent(newTaskUrl, eventTask)
         });
+    }
+
+    const updateTaskEvent = (url, eventTask) => {
+
+        $.ajax({
+            type: eventTask.event,
+            url: url,
+            data: JSON.stringify(eventTask),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            dataType: 'json'
+          });
+
+    };
+
+    class UpdateTask {
+        constructor(id, event, value){
+            this.id = id,
+            this.event = event,
+            this.value = value
+        }
     }
 
     
