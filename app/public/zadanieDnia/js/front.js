@@ -10,11 +10,13 @@ $(document).ready(function() {
             dataType : 'json'
         })
         .done(ret => {
-            console.log(ret);
-
             ret.tasks.forEach((element, i) => {
                createTaskLi(element, i); 
             });
+
+            const loadedLi = $('.todo-list li');
+
+            addClickEvent(loadedLi);
         });
     }
 
@@ -23,15 +25,17 @@ $(document).ready(function() {
     const createTaskLi = (task, i) => {
 
         let complete = '';
+        let checked = '';
 
         if(task.completed){
             complete = 'completed';
+            checked = 'checked';
         }
 
         let li = $(`
                 <li id="${i}" class="${complete}">
                     <div class="view">
-                        <input class="toggle" type="checkbox">
+                        <input class="toggle" type="checkbox" ${checked}>
                         <label>${task.title}</label>
                         <button class="destroy"></button>
                     </div>
@@ -69,6 +73,25 @@ $(document).ready(function() {
             newTaskInp.val('');
         }
     });
+
+    const addClickEvent = (listLi) => {
+
+        const destroyLi = listLi.find('.destroy');
+
+        destroyLi.on('click', function(e){
+            e.stopPropagation();
+            let liId = $(this).parent().parent().attr('id');
+            console.log('usuń!');
+        });
+
+        const completeLi = listLi.find('.toggle');
+
+        completeLi.on('click', function(e){
+            e.stopPropagation();
+            $(this).attr('id');
+            console.log($(this).parent().parent().attr('id'));
+        });
+    }
 
     
 });
