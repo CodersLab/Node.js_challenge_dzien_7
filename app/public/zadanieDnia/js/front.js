@@ -83,12 +83,14 @@ $(document).ready(function() {
         destroyLi.on('click', function(e){
 
             e.stopPropagation();
+
             let liId = $(this).parent().parent().attr('id');
 
             let eventTask = new UpdateTask(liId, 'DELETE', 'true');
 
             updateTaskEvent(newTaskUrl, eventTask);
 
+            $(this).parent().parent().remove();
         });
 
         const completeLi = listLi.find('.toggle');
@@ -105,11 +107,10 @@ $(document).ready(function() {
                 value = true;
             }
 
-            console.log(value);
+            
+            let eventTask = new UpdateTask(liId, 'PUT', value);
 
-             let eventTask = new UpdateTask(liId, 'PUT', value);
-
-             updateTaskEvent(newTaskUrl, eventTask)
+            updateTaskEvent(newTaskUrl, eventTask)
         });
     }
 
