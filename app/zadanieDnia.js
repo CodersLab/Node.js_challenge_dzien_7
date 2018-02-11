@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 
 app.use(express.static('./public/zadanieDnia/'))
 
-app.get('/task/list', (req, res) => {
+app.get('/task', (req, res) => {
     
     fs.readFile(DB_FILE, (err, data) => {
         if (!err){
@@ -41,7 +41,9 @@ app.post('/task', (req, res) => {
 
             fs.writeFile(DB_FILE, writeData, (err, data) => {
                 if (!err) {
-                    res.send('Dodano.');
+                    taskList = JSON.parse(writeData);
+                    console.log(taskList);
+                    res.send(taskList);
                 } else {
                     console.log('Błąd zapisu pliku', err);
                     res.send('Wystąpił błąd zapisu.');

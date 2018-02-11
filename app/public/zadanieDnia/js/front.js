@@ -1,6 +1,6 @@
 $(document).ready(function() {
 
-    const taskListUrl = '/task/list';
+    const taskListUrl = '/task';
     const newTaskUrl  = '/task';
     const listUl  = $('.todo-list');
 
@@ -50,7 +50,7 @@ $(document).ready(function() {
     const newTaskInp = $('.new-todo');
 
     const newTask = (url, task) => {
-
+        // po dodaniu taska trzeba zwrocic indexy i do nowego dodać id
         $.ajax({
             type: "POST",
             url: url,
@@ -59,7 +59,10 @@ $(document).ready(function() {
                 'Content-Type': 'application/json',
             },
             dataType: 'json'
-          });
+          }).done(ret => {
+              let lastLiIndex = ret.tasks.length - 1;
+              $('.todo-list li:last-child').attr('id', lastLiIndex);
+          })
     }
 
     $(document).keypress(function (e) {
