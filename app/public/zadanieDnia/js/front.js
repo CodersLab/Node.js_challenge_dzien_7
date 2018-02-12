@@ -82,7 +82,7 @@ $(document).ready(function() {
     const addClickEvent = (listLi) => {
 
         const destroyLi = listLi.find('.destroy');
-
+        // po usunięciu trzeba przeliczyc id kazdego poniewaz w pliku zadania trzymane sa po indexie w pliku
         destroyLi.on('click', function(e){
 
             e.stopPropagation();
@@ -91,9 +91,12 @@ $(document).ready(function() {
 
             let eventTask = new UpdateTask(liId, 'DELETE', 'true');
 
-            updateTaskEvent(newTaskUrl, eventTask);
+             updateTaskEvent(newTaskUrl, eventTask);
 
             $(this).parent().parent().remove();
+
+            addIndexes();
+            
         });
 
         const completeLi = listLi.find('.toggle');
@@ -109,8 +112,7 @@ $(document).ready(function() {
             if(completeValue == 0){
                 value = true;
             }
-
-            
+                        
             let eventTask = new UpdateTask(liId, 'PUT', value);
 
             updateTaskEvent(newTaskUrl, eventTask)
@@ -130,6 +132,18 @@ $(document).ready(function() {
           });
 
     };
+
+    let addIndexes = () => {
+
+        const loadedLi = $('.todo-list li');
+
+            i = 0;
+            for(let li of loadedLi){
+                li.id = i;
+                i++;
+            }
+    }
+    
 
     class UpdateTask {
         constructor(id, event, value){
