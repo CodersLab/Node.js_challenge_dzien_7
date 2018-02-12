@@ -103,18 +103,26 @@ $(document).ready(function() {
 
         completeLi.on('click', function(e){
             e.stopPropagation();
-            let liId = $(this).parent().parent().attr('id');
 
+            let li = $(this).parent().parent();
+            let completeValue = li.attr('data-complete');
+            let liId = li.attr('id');
             let value = false;
 
-            let completeValue = $(this).parent().parent().attr('data-complete');
-
-            if(completeValue == 0){
-                value = true;
+            switch(completeValue){
+                case "0":
+                    value = true;
+                    li.addClass('completed');
+                    li.attr('data-complete', 1);
+                    break;
+                case "1":
+                    value = false;
+                    li.removeClass('completed')
+                    li.attr('data-complete', 0);
+                    break;
             }
-                        
-            let eventTask = new UpdateTask(liId, 'PUT', value);
 
+            let eventTask = new UpdateTask(liId, 'PUT', value);
             updateTaskEvent(newTaskUrl, eventTask)
         });
     }
