@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const reader = require('./reader/reader');
+const reader = require('./reader/reader.js');
 const fs = require('fs');
 
 const DB_FILE = './data/toDo/tasks.json';
@@ -15,15 +15,10 @@ app.use(bodyParser.json());
 app.use(express.static('./public/zadanieDnia/'))
 
 app.get('/task', (req, res) => {
-    
-    fs.readFile(DB_FILE, (err, data) => {
-        if (!err){
-            taskList = JSON.parse(data);
-            res.send(taskList);
-        } else {
-            throw new Error("Bład zaladowania taskow");
-        }
-    });
+
+    reader.readFile().then(
+        val => res.send(val)
+    );
     
 });
 
@@ -87,8 +82,6 @@ app.delete('/task', (req, res) => {
 app.put('/task', (req, res) => {
 
     let eventTask = req.body;
-
-    console.log(eventTask);
 
     fs.readFile(DB_FILE, (err, data) => {
         if (!err){

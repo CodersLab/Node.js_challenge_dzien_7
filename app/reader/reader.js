@@ -2,20 +2,28 @@ const fs = require('fs');
 
 const DB_FILE = './data/toDo/tasks.json';
 
-var readTaskList = () => {
+const readFile = () => {
 
-    let taskList;
+    return p = new Promise(function(resolve, reject) {  
 
-    fs.readFile(DB_FILE, (err, data) => {
-        if (!err){
-            let taskList = JSON.parse(data);
-            
-        } else {
-            throw new Error("Bład zaladowania taskow");
-        }
-    });
+        let taskList;
 
-    return taskList
+        fs.readFile(DB_FILE, (err, data) => {
+            if (!err){
+                let taskList = JSON.parse(data);
+                resolve(taskList);
+            } else {
+                reject(err);
+            }
+        });
+     });
 }
 
-module.exports.readTaskList  = readTaskList;
+const writeFile = () => {
+
+};
+
+
+module.exports = {
+    readFile
+};

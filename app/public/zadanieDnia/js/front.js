@@ -1,8 +1,8 @@
 $(document).ready(function() {
 
-    const taskListUrl = '/task';
-    const newTaskUrl  = '/task';
+    const url  = '/task';
     const listUl  = $('.todo-list');
+    const loadedLi = $('.todo-list li');
 
     const readData = (url) =>  {
         $.ajax({
@@ -14,13 +14,11 @@ $(document).ready(function() {
                createTaskLi(element, i); 
             });
 
-            const loadedLi = $('.todo-list li');
-
             addClickEvent(loadedLi);
         });
     }
 
-    readData(taskListUrl);
+    readData(url);
 
     const createTaskLi = (task, i) => {
 
@@ -50,7 +48,7 @@ $(document).ready(function() {
     const newTaskInp = $('.new-todo');
 
     const newTask = (url, task) => {
-        // po dodaniu taska trzeba zwrocic indexy i do nowego dodać id
+
         $.ajax({
             type: "POST",
             url: url,
@@ -73,7 +71,7 @@ $(document).ready(function() {
                 "completed": false
              }
 
-            newTask(newTaskUrl, taskModel);
+            newTask(url, taskModel);
             createTaskLi(taskModel); 
             newTaskInp.val('');
         }
@@ -82,7 +80,7 @@ $(document).ready(function() {
     const addClickEvent = (listLi) => {
 
         const destroyLi = listLi.find('.destroy');
-        // po usunięciu trzeba przeliczyc id kazdego poniewaz w pliku zadania trzymane sa po indexie w pliku
+
         destroyLi.on('click', function(e){
 
             e.stopPropagation();
@@ -91,7 +89,7 @@ $(document).ready(function() {
 
             let eventTask = new UpdateTask(liId, 'DELETE', 'true');
 
-             updateTaskEvent(newTaskUrl, eventTask);
+            updateTaskEvent(url, eventTask);
 
             $(this).parent().parent().remove();
 
@@ -123,7 +121,7 @@ $(document).ready(function() {
             }
 
             let eventTask = new UpdateTask(liId, 'PUT', value);
-            updateTaskEvent(newTaskUrl, eventTask)
+            updateTaskEvent(url, eventTask)
         });
     }
 
