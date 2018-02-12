@@ -13,7 +13,7 @@ $(() => {
     <li ${task.comleted ? 'completed' : null} id='${task.id}'>
       <div class="view">
         <input class="toggle" type="checkbox">
-        <label>${task.id + ' ' + task.text}</label>
+        <label>${task.text}</label>
         <button class="destroy"></button>
       </div>
       <input class="edit" value="Rule the web">
@@ -21,32 +21,61 @@ $(() => {
     `));
   };
   
-  //TODO add sending modification on enter
   const addTaskEventHandlers = element => {
+    const endModify = () => {
+      const id = event.target.parentNode.parentNode.id;
+      const text = event.target.innerText;
+      
+      $.ajax({
+        url: '/modify',
+        data: JSON.stringify({ id, text }),
+        headers: JSON_AJAX.HEADERS,
+        type: JSON_AJAX.TYPE,
+        dataType: JSON_AJAX.DATATYPE
+      }).then(({ newList, response }) => {
+        console.log('newList', JSON.parse(newList));
+        if (newList) {
+          updateList(JSON.parse(newList));
+        }
+        console.log(response);
+      });
+      
+      $(event.target).attr('contentEditable', false);
+    }
+
+    //edit task
     element.dblclick(event => {
       console.log('onDblClick', event.target);
       $(event.target)
       .attr('contentEditable', true)
       .focus()
+      .keypress(event => {
+        if(event.which == 13) {
+          endModify();
+        }
+      })
       .blur(event => {
-        const id = event.target.parentNode.parentNode.id;
-        const text = event.target.innerText;
-        
-        $.ajax({
-          url: '/modify',
-          data: JSON.stringify({ id, text }),
-          headers: JSON_AJAX.HEADERS,
-          type: JSON_AJAX.TYPE,
-          dataType: JSON_AJAX.DATATYPE
-        }).then(({ newList, response }) => {
-          console.log('newList', JSON.parse(newList));
-          if (newList) {
-            updateList(JSON.parse(newList));
-          }
-          console.log(response);
-        });
-        
-        $(event.target).attr('contentEditable', false);
+        endModify();
+      });
+    });
+
+    //delete task
+    element.find('.destroy').click(event => {
+      console.log(event.target.parentNode.parentNode.id)
+      const id = event.target.parentNode.parentNode.id;
+
+      $.ajax({
+        url: '/destroy',
+        data: JSON.stringify({ id }),
+        headers: JSON_AJAX.HEADERS,
+        type: JSON_AJAX.TYPE,
+        dataType: JSON_AJAX.DATATYPE
+      }).then(({ newList, response }) => {
+        console.log('newList', JSON.parse(newList));
+        if (newList) {
+          updateList(JSON.parse(newList));
+        }
+        console.log(response);
       });
     });
   }
@@ -73,8 +102,8 @@ $(() => {
     console.log(response);
   });
   
-  //TODO modify enter to work only when new taskk input is focused
-  $(document).keypress(event => {
+  //add new task
+  newTask.keypress(event => {
     if(event.which == 13) {
       $.ajax({
         url: '/new-task',
@@ -87,6 +116,7 @@ $(() => {
       }).then(({ newList, response }) => {
         if (newList) {
           updateList(newList);
+          newTask.val('');
         }
         console.log(response);
       });
