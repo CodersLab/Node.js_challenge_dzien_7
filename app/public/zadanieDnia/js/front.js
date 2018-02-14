@@ -14,6 +14,8 @@ $(document).ready(function() {
                createTaskLi(element, i); 
             });
 
+            const loadedLi = $('.todo-list li');
+
             addClickEvent(loadedLi);
         });
     }

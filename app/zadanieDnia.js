@@ -26,55 +26,31 @@ app.post('/task', (req, res) => {
 
     let newTask = req.body;
 
-    fs.readFile(DB_FILE, (err, data) => {
-        if (!err){
-            taskList = JSON.parse(data);
-
-            let allTasks = { "tasks" : [...taskList.tasks, newTask]};
-
-            let writeData = JSON.stringify(allTasks);
-
-            fs.writeFile(DB_FILE, writeData, (err, data) => {
-                if (!err) {
-                    taskList = JSON.parse(writeData);
-                    console.log(taskList);
-                    res.send(taskList);
-                } else {
-                    console.log('Błąd zapisu pliku', err);
-                    res.send('Wystąpił błąd zapisu.');
-                }
-            });
-        } else {
-            throw new Error("Bład zaladowania taskow");
+    reader.readFile().then(
+        (taskList) => {
+            return JSON.stringify({ "tasks" : [...taskList.tasks, newTask]});
         }
+    ).then((result) => {
+        reader.writeFile(result).then(
+            result => res.send(result)
+        );
     });
+
 });
 
 app.delete('/task', (req, res) => {
 
     let eventTask = req.body;
 
-    fs.readFile(DB_FILE, (err, data) => {
-        if (!err){
-            taskList = JSON.parse(data);
-
-            taskList.tasks.splice(eventTask.id, 1)
-
-            let allTasks = { "tasks" : [...taskList.tasks]};
-
-            let writeData = JSON.stringify(allTasks);
-
-            fs.writeFile(DB_FILE, writeData, (err, data) => {
-                if (!err) {
-                    res.send('Dodano.');
-                } else {
-                    console.log('Błąd zapisu pliku', err);
-                    res.send('Wystąpił błąd zapisu.');
-                }
-            });
-        } else {
-            throw new Error("Bład zaladowania taskow");
+    reader.readFile().then(
+        (taskList) => {
+            taskList.tasks.splice(eventTask.id, 1);
+            return JSON.stringify({ "tasks" : [...taskList.tasks]});
         }
+    ).then((result) => {
+        reader.writeFile(result).then(
+            result => res.send(result)
+        );
     });
 
 });
