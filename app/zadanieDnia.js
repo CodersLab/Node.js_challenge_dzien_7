@@ -66,14 +66,14 @@ app.post('/modify', (req, res) => {
         if (String(task.id) === modifiedTask.id) {
           Object.assign(task, modifiedTask, { id: Number(task.id) })
         }
-        
+
         return task;
       });
 
       fs.writeFile(DB_FILE, JSON.stringify(newList), (err) => {
         if(!err) {
           const response = 'Modyfikacja zapisana';
-          res.json({ newList: JSON.stringify(newList), response })
+          res.json({ newList, response })
           console.log(response);
         } else {
           const response = 'Błąd przy zapisywaniu modyfikacji';
@@ -101,7 +101,7 @@ app.post('/destroy', (req, res) => {
       fs.writeFile(DB_FILE, JSON.stringify(newList), (err) => {
         if(!err) {
           const response = 'Zadanie usunięto';
-          res.json({ newList: JSON.stringify(newList), response })
+          res.json({ newList, response })
           console.log(response);
         } else {
           const response = 'Błąd przy zapisywaniu do bazy danych';

@@ -2,12 +2,7 @@
 $(() => {
   const newTask = $('.new-todo');
   const list = $('.todo-list');
-  const JSON_AJAX = {
-    HEADERS: { 'Content-type': 'application/json' },
-    TYPE: 'POST',
-    DATATYPE: 'json'
-  }
-
+  
   const addItem = task => {
     list.prepend($(`
     <li ${task.comleted ? 'completed' : null} id='${task.id}'>
@@ -21,42 +16,57 @@ $(() => {
     `));
   };
   
-  const addTaskEventHandlers = element => {
-    const endModify = () => {
-      const id = event.target.parentNode.parentNode.id;
-      const text = event.target.innerText;
-      
-      $.ajax({
-        url: '/modify',
-        data: JSON.stringify({ id, text }),
-        headers: JSON_AJAX.HEADERS,
-        type: JSON_AJAX.TYPE,
-        dataType: JSON_AJAX.DATATYPE
-      }).then(({ newList, response }) => {
-        console.log('newList', JSON.parse(newList));
-        if (newList) {
-          updateList(JSON.parse(newList));
-        }
-        console.log(response);
-      });
-      
-      $(event.target).attr('contentEditable', false);
-    }
+  const updateList = newList => {
+    list.empty();
+    newList.forEach(task => {
+      addItem(task);
+    });
+    addTaskEventHandlers($('.todo-list li'));
+  }
+  
+  const sendJsonReq = (url, data, ...options) => {
+    $.ajax({
+      url,
+      data: JSON.stringify(data),
+      headers: { 'Content-type': 'application/json' },
+      type: 'POST',
+      dataType: 'json'
+    }).then(({ newList, response }) => {
+      if (newList) {
+        updateList(newList);
 
-    //edit task
+        if (options && options.length > 0) {
+          options.forEach(callback => callback());
+        }
+      }
+      console.log(response);
+    });
+  }
+
+  const addTaskEventHandlers = element => {
+    //modify task
     element.dblclick(event => {
       console.log('onDblClick', event.target);
       $(event.target)
       .attr('contentEditable', true)
       .focus()
+      .blur(event => {
+        const id = event.target.parentNode.parentNode.id;
+        const text = event.target.innerText;
+      
+        if (!text) {  //remove task if entire content deleted
+          sendJsonReq('/destroy', { id });  
+        } else {
+          sendJsonReq('/modify', { id, text });
+        }
+
+        $(event.target).attr('contentEditable', false);
+      })
       .keypress(event => {
         if(event.which == 13) {
-          endModify();
+          $(event.target).trigger('blur');
         }
       })
-      .blur(event => {
-        endModify();
-      });
     });
 
     //delete task
@@ -64,62 +74,24 @@ $(() => {
       console.log(event.target.parentNode.parentNode.id)
       const id = event.target.parentNode.parentNode.id;
 
-      $.ajax({
-        url: '/destroy',
-        data: JSON.stringify({ id }),
-        headers: JSON_AJAX.HEADERS,
-        type: JSON_AJAX.TYPE,
-        dataType: JSON_AJAX.DATATYPE
-      }).then(({ newList, response }) => {
-        console.log('newList', JSON.parse(newList));
-        if (newList) {
-          updateList(JSON.parse(newList));
-        }
-        console.log(response);
-      });
+      sendJsonReq('/destroy', { id });
     });
   }
-  
-  const updateList = newList => {
-    //rerenders task list
-    list.empty();
-    newList.forEach(task => {
-      addItem(task);
-    });
-    addTaskEventHandlers($('.todo-list li'));
-  }
-
-  //initial list pull
-  $.ajax({
-    url: '/list',
-    headers: JSON_AJAX.HEADERS,
-    type: JSON_AJAX.TYPE,
-    dataType: JSON_AJAX.DATATYPE
-  }).then(({ newList, response }) => {
-    if (newList) {
-      updateList(newList);
-    }
-    console.log(response);
-  });
   
   //add new task
-  newTask.keypress(event => {
+  newTask
+  .blur(event => {
+    if (newTask.val()) { //add only if not empty
+      sendJsonReq('/new-task', { text: newTask.val() });
+      newTask.val('');
+    }
+  })
+  .keypress(event => {
     if(event.which == 13) {
-      $.ajax({
-        url: '/new-task',
-        data: JSON.stringify({
-          text: newTask.val(),
-        }),
-        headers: JSON_AJAX.HEADERS,
-        type: JSON_AJAX.TYPE,
-        dataType: JSON_AJAX.DATATYPE
-      }).then(({ newList, response }) => {
-        if (newList) {
-          updateList(newList);
-          newTask.val('');
-        }
-        console.log(response);
-      });
+      newTask.trigger('blur');
     }
   });
+
+  //initial list pull
+  sendJsonReq('/list', {});
 });
