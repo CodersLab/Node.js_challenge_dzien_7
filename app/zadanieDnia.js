@@ -9,7 +9,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.static('./app/public/zadanieDnia/'));
 
-app.post('/list', (req, res) => {
+app.post('/list/all', (req, res) => {
   fs.readFile(DB_FILE, (err, data) => {
     if (!err){
       const newList = JSON.parse(data);
@@ -58,6 +58,7 @@ app.post('/new-task', (req, res) => {
 
 app.post('/modify', (req, res) => {
   const modifiedTask = req.body;
+  console.log(modifiedTask)
   
   fs.readFile(DB_FILE, (err, data) => {
     if (!err){
@@ -73,7 +74,7 @@ app.post('/modify', (req, res) => {
       fs.writeFile(DB_FILE, JSON.stringify(newList), (err) => {
         if(!err) {
           const response = 'Modyfikacja zapisana';
-          res.json({ newList, response })
+          res.json({ response })
           console.log(response);
         } else {
           const response = 'Błąd przy zapisywaniu modyfikacji';
@@ -117,5 +118,20 @@ app.post('/destroy', (req, res) => {
   });
 });
 
+app.post('/list/completed', (req, res) => {
+  fs.readFile(DB_FILE, (err, data) => {
+    if (!err) {
+      const list = JSON.parse(data);
+      const newList = list.filter(task => task.completed === true);
+      const response = 'Odczytano z bazy danych zadania o stausie completed';
+      res.json({ newList, response });
+      console.log(response);
+    } else {
+      const response = 'Błąd odczytu bazy danych';
+      res.json({ response });
+      console.log(response, err);
+    }
+  });
+});
 
 app.listen(3000, () => console.log('serwer stoi na porcie 3000'));
