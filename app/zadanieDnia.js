@@ -58,32 +58,20 @@ app.delete('/task', (req, res) => {
 app.put('/task', (req, res) => {
 
     let eventTask = req.body;
-
-    fs.readFile(DB_FILE, (err, data) => {
-        if (!err){
-            taskList = JSON.parse(data);
-
+    
+    reader.readFile().then(
+        (taskList) => {
             let finded = taskList.tasks[eventTask.id];
-
             finded.completed = eventTask.value;
-
-            let allTasks = { "tasks" : [...taskList.tasks]};
-
-            let writeData = JSON.stringify(allTasks);
-
-            fs.writeFile(DB_FILE, writeData, (err, data) => {
-                if (!err) {
-                    res.send('Dodano.');
-                } else {
-                    console.log('Błąd zapisu pliku', err);
-                    res.send('Wystąpił błąd zapisu.');
-                }
-            });
-        } else {
-            throw new Error("Bład zaladowania taskow");
+            return JSON.stringify({ "tasks" : [...taskList.tasks]});
         }
+    ).then((result) => {
+        reader.writeFile(result).then(
+            result => res.send(result)
+        );
     });
 
+   
 });
 
 app.listen(3000, () => {

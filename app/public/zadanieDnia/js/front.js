@@ -13,10 +13,7 @@ $(document).ready(function() {
             ret.tasks.forEach((element, i) => {
                createTaskLi(element, i); 
             });
-
-            const loadedLi = $('.todo-list li');
-
-            addClickEvent(loadedLi);
+            addClickEvent($('.todo-list li'));
         });
     }
 
@@ -76,6 +73,7 @@ $(document).ready(function() {
             newTask(url, taskModel);
             createTaskLi(taskModel); 
             newTaskInp.val('');
+            addClickEvent($('.todo-list li'));
         }
     });
 
