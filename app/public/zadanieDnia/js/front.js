@@ -2,9 +2,11 @@
 $(() => {
   const newTask = $('.new-todo');
   const list = $('.todo-list');
-  const filterCompleted = $('#filter-completed');
-  const filterAll = $('#filter-all');
-  const filterActive = $('#filter-active');
+  const filterAllBtn = $('#filter-all');
+  const filterCompletedBtn = $('#filter-completed');
+  const filterActiveBtn = $('#filter-active');
+  const clearBtn = $('.clear-completed');
+  const leftToDos = $('.todo-count');
   
   const addItem = task => {
     list.prepend($(`
@@ -25,7 +27,7 @@ $(() => {
       addItem(task);
     });
     addTaskEventHandlers($('.todo-list li'));
-  }
+  };
   
   const sendJsonReq = (url, data = {}, ...options) => {
     $.ajax({
@@ -44,12 +46,12 @@ $(() => {
       }
       console.log(response);
     });
-  }
+  };
 
   const addTaskEventHandlers = element => {
     //modify task
-    element.dblclick(event => {
-      console.log('onDblClick', event.target);
+    // element.dblclick(event => {
+    element.on('dblclick touchstart', event => { //TODO make touch event fire only when no move detected
       $(event.target)
         .attr('contentEditable', true)
         .focus()
@@ -74,7 +76,6 @@ $(() => {
 
     //delete task
     element.find('.destroy').click(event => {
-      console.log(event.target.parentNode.parentNode.id)
       const id = event.target.parentNode.parentNode.id;
 
       sendJsonReq('/destroy', { id });
@@ -88,7 +89,11 @@ $(() => {
 
       sendJsonReq('/modify', { id, completed: isCompleted })
     });
-  }
+  };
+
+  const updateLeftTasks = () => {
+    leftToDos.find('strong').text('jakaś liczba');
+  };
   
   //add new task
   newTask
@@ -104,11 +109,36 @@ $(() => {
       }
     });
 
-  //show only completed
-  filterCompleted.click(event => {
+  /* filters */
+  filterAllBtn.click(event => {
+    event.preventDefault();
+
+    sendJsonReq('/list/all');
+    $('.filters').find('a').removeClass('selected');
+    filterAllBtn.addClass('selected');
+  });
+  filterCompletedBtn.click(event => {
     event.preventDefault();
 
     sendJsonReq('/list/completed');
+    $('.filters').find('a').removeClass('selected');
+    filterCompletedBtn.addClass('selected');
+  });
+  filterActiveBtn.click(event => {
+    event.preventDefault();
+
+    sendJsonReq('/list/active');
+    $('.filters').find('a').removeClass('selected');
+    filterActiveBtn.addClass('selected');
+  });
+
+  //clear completed
+  clearBtn.click(event => {
+    event.preventDefault();
+
+    sendJsonReq('/list/clear-completed')
+    $('.filters').find('a').removeClass('selected');
+    filterAllBtn.addClass('selected');
   });
 
   //initial list pull
