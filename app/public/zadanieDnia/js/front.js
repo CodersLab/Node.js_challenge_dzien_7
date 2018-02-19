@@ -20,7 +20,11 @@ $(() => {
     </li>
     `));
   };
-  
+
+  const updateLeftTasks = (number) => {
+    leftToDos.find('strong').text(number);
+  };
+
   const updateList = newList => {
     list.empty();
     newList.forEach(task => {
@@ -36,21 +40,20 @@ $(() => {
       headers: { 'Content-type': 'application/json' },
       type: 'POST',
       dataType: 'json'
-    }).then(({ newList, response }) => {
+    }).then(({ newList, response, activeTasks }) => {
       if (newList) {
         updateList(newList);
-
         if (options && options.length > 0) {
           options.forEach(callback => callback());
         }
       }
+      updateLeftTasks(activeTasks);
       console.log(response);
     });
   };
 
   const addTaskEventHandlers = element => {
     //modify task
-    // element.dblclick(event => {
     element.on('dblclick touchstart', event => { //TODO make touch event fire only when no move detected
       $(event.target)
         .attr('contentEditable', true)
@@ -89,11 +92,7 @@ $(() => {
 
       sendJsonReq('/modify', { id, completed: isCompleted })
     });
-  };
-
-  const updateLeftTasks = () => {
-    leftToDos.find('strong').text('jakaś liczba');
-  };
+  };  
   
   //add new task
   newTask
@@ -117,6 +116,7 @@ $(() => {
     $('.filters').find('a').removeClass('selected');
     filterAllBtn.addClass('selected');
   });
+
   filterCompletedBtn.click(event => {
     event.preventDefault();
 
@@ -124,6 +124,7 @@ $(() => {
     $('.filters').find('a').removeClass('selected');
     filterCompletedBtn.addClass('selected');
   });
+  
   filterActiveBtn.click(event => {
     event.preventDefault();
 
